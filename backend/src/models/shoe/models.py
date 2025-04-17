@@ -1,3 +1,5 @@
+from flask import request
+
 from src.extensions import db
 from datetime import datetime,timezone
 
@@ -15,10 +17,11 @@ class Brand(db.Model):
     def to_dict(self):
         return {
             "brand_id": self.brand_id,
+            "name": self.name,
             "brand_image": self.brand_image,
-            "name": self.name
+            "created_at": self.created_at,
+            "updated_at": self.updated_at
         }
-
 
 class Category(db.Model):
     __tablename__ = 'categories'
