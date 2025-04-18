@@ -2,11 +2,10 @@ import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import ClientProvider from "@/providers/ClientProvider";
 import { Toaster } from "sonner";
-import { HeaderPageLister } from "@/components/page-listen-header";
 
 const montserrat = Montserrat({
   variable: "--font-montserrat",
@@ -24,7 +23,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning={true}>
       <body className={`${montserrat.variable} antialiased`}>
         <ThemeProvider
           attribute="class"
@@ -34,15 +33,9 @@ export default function RootLayout({
         >
           <SidebarProvider className="with-sidebar">
             <AppSidebar />
-            <main>
-              <div className="sidebar-trigger">
-                <SidebarTrigger />
-                <HeaderPageLister />
-              </div>
-              <ClientProvider>
-                {children}
-              </ClientProvider>
-            </main>
+            <ClientProvider>
+              {children}
+            </ClientProvider>
             <Toaster />
           </SidebarProvider>
         </ThemeProvider>

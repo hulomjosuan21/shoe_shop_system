@@ -1,7 +1,14 @@
+import { SidebarTrigger } from "@/components/ui/sidebar";
 
 export default function Home() {
   return (
-    <div className="">
-    </div>
+    <main>
+      <div className="sidebar-trigger">
+        <SidebarTrigger />
+      </div>
+      <section className="">
+
+      </section>
+    </main>
   )
 }

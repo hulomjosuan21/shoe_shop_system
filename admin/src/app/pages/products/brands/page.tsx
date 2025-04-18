@@ -12,7 +12,6 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
-import axios from 'axios';
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -23,17 +22,20 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import default_image from "@/assets/images/default-image.jpg"
 import Link from "next/link";
+import { Label } from "@/components/ui/label";
+import { Search } from "lucide-react";
+import { addBrand, getBrands } from "@/app/actions/product_actions/actions";
 
 export interface Brand {
     brand_id: string,
     name: string,
     brand_image: string | null,
-    created_at: Date | null,
-    updated_at: Date | null
+    created_at: Date,
+    updated_at: Date
 }
 
-type BrandResponse<T> = {
-    message: string;
+export type BrandResponse<T> = {
+    message?: string;
     brands: T;
 }
 
@@ -53,25 +55,11 @@ export const brandSchema = z.object({
 
 type BrandFormValues = z.infer<typeof brandSchema>;
 
-const getBrands = async (): Promise<BrandResponse<[Brand]>> => {
-    const { data } = await axios.get<BrandResponse<[Brand]>>('http://localhost:5000/shoe/all/brand');
-    return data;
-};
-
-const addBrand = async (formData: FormData): Promise<BrandResponse<Brand>> => {
-    const { data } = await axios.post<BrandResponse<Brand>>('http://localhost:5000/shoe/new/brand', formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data',
-        },
-    });
-    return data;
-};
-
 export default function BrandsPage() {
 
     const { data, isPending, isError, error } = useQuery({
         queryKey: ['brands'],
-        queryFn: getBrands
+        queryFn: () => getBrands({ name: '', sort_by: 'name', order: 'asc' })
     });
 
     const queryClient = useQueryClient();
@@ -103,11 +91,18 @@ export default function BrandsPage() {
         }
 
         try {
-            await addBrand(formData);
-            toast.success("Brand added successfully!");
+            const response = await addBrand(formData);
+            toast.success(response.message);
             queryClient.invalidateQueries({ queryKey: ['brands'] });
-        } catch {
-            throw new Error("Error adding brand!");
+            form.reset()
+            setPreview(null)
+        } catch (error) {
+            if (error instanceof Error) {
+                toast.error(error.message);
+                console.error(error.message);
+            } else {
+                toast.error('⨯ Unknown error');
+            }
         }
     }
 
@@ -124,8 +119,7 @@ export default function BrandsPage() {
     );
 
     return (
-        <div className="">
-
+        <section className="">
             <Card className="m-2">
                 <CardHeader className="border-b">
                     <span className="font-semibold">Add New Brand</span>
@@ -191,6 +185,24 @@ export default function BrandsPage() {
                 </CardContent>
             </Card>
 
+
+            <div className="flex items-center m-2">
+                <form>
+                    <div className="relative">
+                        <Label htmlFor="search" className="sr-only">
+                            Search
+                        </Label>
+                        <Input
+                            id="search"
+                            placeholder="Search..."
+                            className="pl-8"
+                            name="name"
+                        />
+                        <Search className="pointer-events-none absolute left-2 top-1/2 size-4 -translate-y-1/2 select-none opacity-50" />
+                    </div>
+                </form>
+            </div>
+
             <div className="m-2 border rounded-md bg-card shadow-sm text-card-foreground">
                 <Table className="">
                     <TableCaption>A list of shoe brands.</TableCaption>
@@ -199,6 +211,7 @@ export default function BrandsPage() {
                             <TableHead>Brand ID</TableHead>
                             <TableHead>Brand Name</TableHead>
                             <TableHead>Brand Image/Logo</TableHead>
+                            <TableHead>Date Added</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -228,16 +241,17 @@ export default function BrandsPage() {
                                     }
                                 </div>
                             </TableCell>
+                            <TableCell>{brand.created_at.toString()}</TableCell>
                         </TableRow>))}
                     </TableBody>
                     <TableFooter>
                         <TableRow>
-                            <TableCell colSpan={2}>Total Brands</TableCell>
+                            <TableCell colSpan={3}>Total Brands</TableCell>
                             <TableCell className="text-right">{data?.brands.length}</TableCell>
                         </TableRow>
                     </TableFooter>
                 </Table>
             </div>
-        </div>
+        </section>
     )
 }

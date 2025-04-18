@@ -1,103 +1,116 @@
+import * as React from "react"
+
 import {
     Sidebar,
     SidebarContent,
+    SidebarFooter,
     SidebarGroup,
-    SidebarMenuItem,
-    SidebarMenuButton,
+    SidebarGroupContent,
     SidebarGroupLabel,
+    SidebarHeader,
     SidebarMenu,
-    SidebarMenuSub,
-    SidebarMenuSubItem,
-    SidebarMenuSubButton
+    SidebarMenuButton,
+    SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { ChartNoAxesGantt, LayoutDashboard, Pocket, ChartBarStacked, ChartLine, UsersRound, Settings } from "lucide-react"
+import { SearchForm } from "./search-form"
 import Link from "next/link"
+import { ChartBarStacked, ChartSpline, ClipboardMinus, Footprints, LayoutDashboard, Pocket, SendToBack, UsersRound } from "lucide-react"
+import { AppSidebarHeader } from "./sidebar-header"
+import { NavUser } from "./nav-user"
 
+const data = {
+    versions: ["1.0.1", "1.1.0-alpha", "2.0.0-beta1"],
+    navMain: [
+        {
+            url: "#",
+            items: [
+                {
+                    title: "Dashboard",
+                    url: "/",
+                    icon: LayoutDashboard
+                },
+                {
+                    title: "Sales",
+                    url: "/pages/sales",
+                    icon: ChartSpline
+                },
+                {
+                    title: "Orders",
+                    url: "/",
+                    icon: SendToBack
+                }
+            ],
+        },
+        {
+            title: "Catalog",
+            url: "#",
+            items: [
+                {
+                    title: "Shoes",
+                    url: "/pages/products/shoes",
+                    icon: Footprints
+                },
+                {
+                    title: "Brands",
+                    url: "/pages/products/brands",
+                    icon: Pocket
+                },
+                {
+                    title: "Categories",
+                    url: "/pages/products/categories",
+                    icon: ChartBarStacked
+                }
+            ],
+        },
+        {
+            url: "#",
+            items: [
+                {
+                    title: "Customers",
+                    url: "/pages/shoes",
+                    icon: UsersRound
+                },
+                {
+                    title: "Reports",
+                    url: "/",
+                    icon: ClipboardMinus
+                }
+            ],
+        },
+    ],
+}
 
-const items_product = [
-    {
-        title: "Shoes",
-        url: "/pages/shoes",
-        icon: ChartNoAxesGantt,
-    },
-    {
-        title: "Brands",
-        url: "/pages/brands",
-        icon: Pocket,
-    },
-    {
-        title: "Categories",
-        url: "/pages/categories",
-        icon: ChartBarStacked,
-    }
-]
-export function AppSidebar() {
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     return (
-        <Sidebar>
+        <Sidebar {...props}>
+            <SidebarHeader>
+                <AppSidebarHeader />
+                <SearchForm />
+            </SidebarHeader>
             <SidebarContent>
-                <SidebarGroup>
-                    <SidebarMenu>
-                        <SidebarMenuItem>
-                            <SidebarMenuButton asChild>
-                                <Link href="/">
-                                    <LayoutDashboard />
-                                    <span>Dashboard</span>
-                                </Link>
-                            </SidebarMenuButton>
-                        </SidebarMenuItem>
-                        <SidebarMenuItem>
-                            <SidebarMenuButton asChild>
-                                <Link href="/sales">
-                                    <ChartLine />
-                                    <span>Sales</span>
-                                </Link>
-                            </SidebarMenuButton>
-                        </SidebarMenuItem>
-                    </SidebarMenu>
-                </SidebarGroup>
-
-                <SidebarGroup>
-                    <SidebarMenu>
-                        <SidebarMenuItem>
-                            <SidebarGroupLabel>Products</SidebarGroupLabel>
-                            {items_product.map((item) => (
-                                <SidebarMenuSub key={item.title}>
-                                    <SidebarMenuSubItem>
-                                        <SidebarMenuSubButton asChild>
+                {data.navMain.map((item, index) => (
+                    <SidebarGroup key={index} className="border-b">
+                        {item.title && <SidebarGroupLabel>{item.title}</SidebarGroupLabel>}
+                        <SidebarGroupContent>
+                            <SidebarMenu>
+                                {item.items.map((item, index) => (
+                                    <SidebarMenuItem key={index}>
+                                        <SidebarMenuButton asChild>
                                             <Link href={item.url}>
                                                 <item.icon />
                                                 <span>{item.title}</span>
                                             </Link>
-                                        </SidebarMenuSubButton>
-                                    </SidebarMenuSubItem>
-                                </SidebarMenuSub>
-                            ))}
-                        </SidebarMenuItem>
-                    </SidebarMenu>
-                </SidebarGroup>
-
-
-                <SidebarGroup>
-                    <SidebarMenu>
-                        <SidebarMenuItem>
-                            <SidebarMenuButton asChild>
-                                <Link href="/dashboard">
-                                    <UsersRound />
-                                    <span>Customers</span>
-                                </Link>
-                            </SidebarMenuButton>
-                        </SidebarMenuItem>
-                        <SidebarMenuItem>
-                            <SidebarMenuButton asChild>
-                                <Link href="/pages/settings">
-                                    <Settings />
-                                    <span>Settings</span>
-                                </Link>
-                            </SidebarMenuButton>
-                        </SidebarMenuItem>
-                    </SidebarMenu>
-                </SidebarGroup>
+                                        </SidebarMenuButton>
+                                    </SidebarMenuItem>
+                                ))}
+                            </SidebarMenu>
+                        </SidebarGroupContent>
+                    </SidebarGroup>
+                ))}
             </SidebarContent>
+            <SidebarFooter>
+                <NavUser />
+            </SidebarFooter>
         </Sidebar>
     )
 }

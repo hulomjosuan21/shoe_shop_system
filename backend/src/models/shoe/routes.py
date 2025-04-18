@@ -9,7 +9,21 @@ shoe_bp = Blueprint('shoe_bp', __name__)
 
 @shoe_bp.get('all/brand')
 def get_all_brand():
-    brands = Brand.query.all()
+    name = request.args.get('name')
+    sort_by = request.args.get('sort_by', 'id')  # Default to 'id'
+    order = request.args.get('order', 'asc')  # Default to 'asc'
+
+    query = Brand.query
+
+    if name:
+        query = query.filter(Brand.name.ilike(f"%{name}%"))
+
+    if order == 'desc':
+        query = query.order_by(getattr(Brand, sort_by).desc())
+    else:
+        query = query.order_by(getattr(Brand, sort_by).asc())
+
+    brands = query.all()
     return jsonify({'message': 'New Brand added successfully',"brands": [b.to_dict() for b in brands]}), 201
 
 
@@ -22,15 +36,17 @@ def add_brand():
         if not brand_name:
             return jsonify({'error': 'Brand name is required'}), 400
 
-        if brand_image:
-            filename = save_file(brand_image)
-        else:
+        if not brand_image:
             return jsonify({'error': 'No image file provided'}), 400
 
-        value = request.host_url.rstrip("/") + f"/assets/images/{filename}"
-
-        new_brand = Brand(name=brand_name, brand_image=value)
+        new_brand = Brand(name=brand_name)
         db.session.add(new_brand)
+        db.session.flush()
+
+        filename = save_file(brand_image)
+        image_url = request.host_url.rstrip("/") + f"/assets/images/{filename}"
+
+        new_brand.brand_image = image_url
         db.session.commit()
 
         return jsonify({
@@ -39,7 +55,7 @@ def add_brand():
         }), 201
 
     except Exception as e:
-        db.session.rollback()
+        db.session.rollback()  # Rollback in case of error
         return jsonify({'error': str(e)}), 400
 
 @shoe_bp.post('/new/category')
