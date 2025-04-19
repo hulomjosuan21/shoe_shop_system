@@ -42,22 +42,22 @@ const data = {
             ],
         },
         {
-            title: "Catalog",
+            title: "Catalogs",
             url: "#",
             items: [
                 {
                     title: "Shoes",
-                    url: "/pages/products/shoes",
+                    url: "/pages/catalogs/shoe",
                     icon: Footprints
                 },
                 {
                     title: "Brands",
-                    url: "/pages/products/brands",
+                    url: "/pages/catalogs/brand",
                     icon: Pocket
                 },
                 {
                     title: "Categories",
-                    url: "/pages/products/categories",
+                    url: "/pages/catalogs/category",
                     icon: ChartBarStacked
                 }
             ],

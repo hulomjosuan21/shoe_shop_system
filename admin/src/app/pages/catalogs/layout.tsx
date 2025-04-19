@@ -7,7 +7,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <div className="sidebar-trigger">
                 <SidebarTrigger />
             </div>
-            {children}
+            <section className="">
+                {children}
+            </section>
         </main>
     )
 }

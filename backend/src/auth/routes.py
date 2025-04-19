@@ -1,10 +1,11 @@
 from flask import Blueprint
 
 from flask import request, jsonify
-from ..extensions import db
-from ..models.user.model import User, AuthMethodEnum, UserRoleEnum
 
-auth_bp = Blueprint('auth', __name__)
+from src.models import User, AuthMethodEnum, UserRoleEnum
+from src.extensions import db
+
+auth_bp = Blueprint('auth_bp', __name__)
 
 @auth_bp.post('/create/user')
 def create_user():

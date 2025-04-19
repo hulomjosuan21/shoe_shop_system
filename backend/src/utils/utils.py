@@ -1,44 +1,45 @@
-from typing import List, Dict, Any, Optional, Type, Union
-import datetime
-
-from flask import request, jsonify
-from werkzeug.utils import secure_filename
 import os
-import random
-import string
-from datetime import datetime, date
+import uuid
+from datetime import datetime
 
-ASSETS_DIR = os.path.join(os.getcwd(), 'assets')
-IMAGE_DIR = os.path.join(ASSETS_DIR, 'images')
-OTHER_DIR = os.path.join(ASSETS_DIR, 'others')
+from flask import request, jsonify, current_app
+from werkzeug.utils import secure_filename
 
-os.makedirs(IMAGE_DIR, exist_ok=True)
-os.makedirs(OTHER_DIR, exist_ok=True)
+def delete_file(file_url, subfolder="files"):
+    filename = file_url.split(f"/uploads/{subfolder}/")[-1]
 
-def generate_random_string(length=6):
-    return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
+    if not filename:
+        return False
 
-def save_file(file):
-    original_filename = secure_filename(file.filename)
-    file_type = file.content_type
-    print(f"File type: {file_type}")
+    file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], subfolder, filename)
 
-    file_ext = os.path.splitext(original_filename)[1]
+    try:
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+            return True
+        else:
+            return False
+    except Exception as e:
+        print(f"Error deleting file: {e}")
+        return False
 
-    timestamp = datetime.now().strftime("%Y%m%d%H%M%S%f")
-    random_str = generate_random_string()
-    new_filename = f"{timestamp}_{random_str}{file_ext}"
+def save_file(file, subfolder="files"):
+    filename = secure_filename(file.filename)
+    unique_filename = f"{uuid.uuid4().hex}_{datetime.now().strftime('%Y%m%d%H%M%S')}.{filename.rsplit('.', 1)[-1]}"
 
-    if file_type.startswith('image/'):
-        save_path = os.path.join(IMAGE_DIR, new_filename)
-        category = 'image'
-    else:
-        save_path = os.path.join(OTHER_DIR, new_filename)
-        category = 'other'
+    upload_folder = current_app.config['UPLOAD_FOLDER']
+    folder_path = os.path.join(upload_folder, subfolder)
 
-    file.save(save_path)
+    os.makedirs(folder_path, exist_ok=True)
 
-    return new_filename
+    file_path = os.path.join(folder_path, unique_filename)
+    file.save(file_path)
+
+    base_url = request.host_url
+    file_url = f"uploads/{subfolder}/{unique_filename}"
+    full_url = f"{base_url}{file_url}"
+
+    return {"full_url": full_url, "file_url": file_url}
 
 def rate_limit_error_handlers(app):
     @app.errorhandler(429)

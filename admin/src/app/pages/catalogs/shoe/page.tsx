@@ -1,6 +1,5 @@
-
 export default function ShoesPage() {
     return (
-        <section className=""></section>
+        <div className="">Shoe Page</div>
     )
 }

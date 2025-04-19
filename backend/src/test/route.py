@@ -1,5 +1,4 @@
 from flask import Blueprint, request
-# from src.extensions import limiter
 import json
 
 test_bp = Blueprint('test_bp', __name__)
