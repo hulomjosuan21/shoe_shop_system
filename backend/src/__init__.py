@@ -1,9 +1,9 @@
 import os
 
-from flask import Flask, send_from_directory, abort
+from flask import Flask
 from flask_cors import CORS
-from werkzeug.security import safe_join
 
+from src.ai.route import ai_bp
 from src.auth.routes import auth_bp
 from src.config import Config
 from src.extensions import db, migrate, jwt, bcrypt, limiter
@@ -38,7 +38,7 @@ def initialize_app():
     with app.app_context():
         db.create_all()
 
-
+    app.register_blueprint(ai_bp, url_prefix="/ai")
     app.register_blueprint(upload_bp, url_prefix="/uploads")
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(brand_bp, url_prefix='/brand')

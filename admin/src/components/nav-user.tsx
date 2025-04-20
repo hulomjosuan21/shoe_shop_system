@@ -28,6 +28,7 @@ import {
     SidebarMenuItem,
     useSidebar,
 } from "@/components/ui/sidebar"
+import Link from "next/link"
 
 export function NavUser() {
     const { isMobile } = useSidebar()
@@ -87,7 +88,7 @@ export function NavUser() {
                         <DropdownMenuGroup>
                             <DropdownMenuItem>
                                 <Settings />
-                                Settings
+                                <Link href={'/pages/settings'}>Settings</Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem>
                                 <Bell />

@@ -9,7 +9,7 @@ brand_bp = Blueprint('brand_bp', __name__)
 @brand_bp.get('/all')
 def get_all_brand():
     name = request.args.get('name')
-    sort_by = request.args.get('sort_by', 'id')
+    sort_by = request.args.get('sort_by', 'brand_id')
     order = request.args.get('order', 'asc')
 
     query = Brand.query
@@ -23,7 +23,7 @@ def get_all_brand():
         query = query.order_by(getattr(Brand, sort_by).asc())
 
     brands = query.all()
-    return jsonify({'message': 'New Brand added successfully',"value": [b.to_dict() for b in brands]}), 201
+    return jsonify({'message': 'All brand fetched successfully',"value": [b.to_dict() for b in brands]}), 201
 
 
 @brand_bp.post('/new')
@@ -80,4 +80,3 @@ def delete_brand():
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 400
-

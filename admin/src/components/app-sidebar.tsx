@@ -1,116 +1,127 @@
-import * as React from "react"
+"use client"
 
+import * as React from "react"
+import {
+    ChartLine,
+    ChartNoAxesGantt,
+    LayoutDashboard,
+    MessageSquareWarning,
+    SquareDashedBottom,
+    SquareRoundCorner,
+    UsersRound,
+} from "lucide-react"
+
+import { NavMain } from "@/components/nav-main"
+import { NavUser } from "@/components/nav-user"
 import {
     Sidebar,
     SidebarContent,
     SidebarFooter,
-    SidebarGroup,
-    SidebarGroupContent,
-    SidebarGroupLabel,
     SidebarHeader,
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    SidebarRail,
 } from "@/components/ui/sidebar"
-import { SearchForm } from "./search-form"
 import Link from "next/link"
-import { ChartBarStacked, ChartSpline, ClipboardMinus, Footprints, LayoutDashboard, Pocket, SendToBack, UsersRound } from "lucide-react"
-import { AppSidebarHeader } from "./sidebar-header"
-import { NavUser } from "./nav-user"
+import { SearchForm } from "./search-form"
 
 const data = {
-    versions: ["1.0.1", "1.1.0-alpha", "2.0.0-beta1"],
+    header: {
+        name: "Shoe Shop",
+        logo: SquareDashedBottom,
+        description: "Simple shoe shop",
+    },
     navMain: [
-        {
-            url: "#",
-            items: [
-                {
-                    title: "Dashboard",
-                    url: "/",
-                    icon: LayoutDashboard
-                },
-                {
-                    title: "Sales",
-                    url: "/pages/sales",
-                    icon: ChartSpline
-                },
-                {
-                    title: "Orders",
-                    url: "/",
-                    icon: SendToBack
-                }
-            ],
-        },
-        {
-            title: "Catalogs",
-            url: "#",
-            items: [
-                {
-                    title: "Shoes",
-                    url: "/pages/catalogs/shoe",
-                    icon: Footprints
-                },
-                {
-                    title: "Brands",
-                    url: "/pages/catalogs/brand",
-                    icon: Pocket
-                },
-                {
-                    title: "Categories",
-                    url: "/pages/catalogs/category",
-                    icon: ChartBarStacked
-                }
-            ],
-        },
-        {
-            url: "#",
-            items: [
-                {
-                    title: "Customers",
-                    url: "/pages/shoes",
-                    icon: UsersRound
-                },
-                {
-                    title: "Reports",
-                    url: "/",
-                    icon: ClipboardMinus
-                }
-            ],
-        },
-    ],
+        [
+            {
+                title: "Dashboard",
+                url: "/",
+                icon: LayoutDashboard,
+                items: []
+            },
+            {
+                title: "Sales",
+                url: "/pages/sales",
+                icon: ChartLine,
+                items: []
+            },
+            {
+                title: "Orders",
+                url: "/",
+                icon: SquareRoundCorner,
+                items: []
+            },
+            {
+                title: "Catalogs",
+                url: "#",
+                icon: ChartNoAxesGantt,
+                isActive: true,
+                items: [
+                    {
+                        title: "Shoe",
+                        url: "/pages/catalogs/shoe",
+                    },
+                    {
+                        title: "Brands",
+                        url: "/pages/catalogs/brand",
+                    },
+                    {
+                        title: "Categories",
+                        url: "/pages/catalogs/category",
+                    }
+                ],
+            },
+        ],
+        [
+            {
+                title: "Customers",
+                url: "/",
+                icon: UsersRound,
+                items: []
+            },
+            {
+                title: "Reports",
+                url: "/",
+                icon: MessageSquareWarning,
+                items: []
+            }
+        ],
+    ]
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     return (
-        <Sidebar {...props}>
+        <Sidebar collapsible="icon" {...props}>
             <SidebarHeader>
-                <AppSidebarHeader />
+                <SidebarHeader>
+                    <SidebarMenu>
+                        <SidebarMenuItem>
+                            <SidebarMenuButton
+                                asChild
+                                className="data-[slot=sidebar-menu-button]:!p-1.5"
+                            >
+                                <Link href="/">
+                                    <data.header.logo className="h-5 w-5" />
+                                    <span className="text-base font-semibold">{data.header.name}</span>
+                                </Link>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                    </SidebarMenu>
+                </SidebarHeader>
                 <SearchForm />
             </SidebarHeader>
             <SidebarContent>
-                {data.navMain.map((item, index) => (
-                    <SidebarGroup key={index} className="border-b">
-                        {item.title && <SidebarGroupLabel>{item.title}</SidebarGroupLabel>}
-                        <SidebarGroupContent>
-                            <SidebarMenu>
-                                {item.items.map((item, index) => (
-                                    <SidebarMenuItem key={index}>
-                                        <SidebarMenuButton asChild>
-                                            <Link href={item.url}>
-                                                <item.icon />
-                                                <span>{item.title}</span>
-                                            </Link>
-                                        </SidebarMenuButton>
-                                    </SidebarMenuItem>
-                                ))}
-                            </SidebarMenu>
-                        </SidebarGroupContent>
-                    </SidebarGroup>
-                ))}
+                {
+                    data.navMain.map((item, index) => (
+                        <NavMain items={item} key={index} />
+                    ))
+                }
             </SidebarContent>
             <SidebarFooter>
                 <NavUser />
             </SidebarFooter>
+            <SidebarRail />
         </Sidebar>
     )
 }

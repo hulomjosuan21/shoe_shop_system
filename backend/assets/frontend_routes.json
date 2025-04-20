@@ -1,0 +1,14 @@
+[
+    {
+        "path": "/",
+        "description": "View System Overview and dashboad"
+    },
+    {
+        "path": "/pages/catalogs/brand",
+        "description": "Manage brands (Add/Edit/Delete)"
+    },
+    {
+        "path": "/pages/sales",
+        "description": "View & Manage Sales"
+    }
+]
