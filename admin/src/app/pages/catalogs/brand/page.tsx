@@ -14,14 +14,23 @@ import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { useState } from "react"
+import { useState, useTransition } from "react"
 import Image from "next/image"
 import { addBrand } from "@/app/actions/brand_actions"
 import default_image from "@/assets/images/default-image.jpg"
+import { toast } from "sonner"
+
+export interface Brand {
+    brand_id: number,
+    name: string,
+    brand_image: string,
+    created_at: Date,
+    updated_at: Date
+}
 
 const formSchema = z.object({
-    name: z.string().min(5, {
-        message: "Username must be at least 2 characters.",
+    name: z.string().min(1, {
+        message: "Username must be at least 1 characters.",
     }),
     brand_image: z
         .any()
@@ -34,7 +43,9 @@ const formSchema = z.object({
 });
 
 export default function BrandPage() {
+    const [isAdding, startAdding] = useTransition()
     const [imagePreview, setImagePreview] = useState<string | null>(null);
+
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -45,13 +56,30 @@ export default function BrandPage() {
     })
 
     function onSubmit(values: z.infer<typeof formSchema>) {
-        addBrand(values)
+        startAdding(async () => {
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+            try {
+                const formData = new FormData();
+                formData.append("name", values.name);
+                formData.append("brand_image", values.brand_image);
+
+                const response = await addBrand(formData);
+                if (response.success) {
+                    toast.success(`${response.message}: ${response.payload.name}`);
+                    form.reset();
+                    setImagePreview(null);
+                }
+            } catch (error) {
+                const message = error instanceof Error ? error.message : 'Something went wrong';
+                toast.error(message);
+            }
+        });
     }
 
     return (
         <main className="">
 
-            <section className="flex m-4 flex-wrap">
+            <section className="flex m-4 flex-wrap gap-4">
                 <div className="flex justify-center">
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -87,12 +115,12 @@ export default function BrandPage() {
                                                 }}
                                             />
                                         </FormControl>
-                                        <FormDescription>Image must be a file and less than 5 MB.</FormDescription>
+                                        <FormDescription>Image must be a image file and less than 5 MB.</FormDescription>
                                         <FormMessage />
                                     </FormItem>
                                 )}
                             />
-                            <Button type="submit">Submit</Button>
+                            <Button type="submit" disabled={isAdding}>{isAdding ? 'Saving...' : 'Submit'}</Button>
                         </form>
                     </Form>
                 </div>

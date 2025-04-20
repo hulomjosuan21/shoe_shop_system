@@ -12,17 +12,14 @@ export type ApiResponse<T> = {
     payload: T
 }
 
-export function ApiError(error: unknown): never {
+export function ApiError(error: unknown): string {
     if (axios.isAxiosError<FlaskErrorResponse>(error)) {
-        const message = error.response?.data?.error ?? 'Unknown server error';
-        const status = error.response?.status ?? 500;
-
-        throw new Error(`⨯ Error [AxiosError]: ${message} (Status: ${status})`);
+        return error.response?.data?.error ?? 'Unknown server error';
     }
 
     if (error instanceof Error) {
-        throw new Error(`⨯ Unexpected Error: ${error.message}`);
+        return error.message;
     }
 
-    throw new Error('⨯ Unknown error occurred');
+    return 'Unknown error occurred';
 }

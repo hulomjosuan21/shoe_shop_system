@@ -2,7 +2,7 @@ from flask import request, jsonify, Blueprint
 
 from src.models.brand_model import Brand
 from src.extensions import db
-from src.utils.utils import save_file, delete_file
+from src.utils.utils import ApiErrorResponse, ApiResponse, RemoveFile, SaveFile
 
 brand_bp = Blueprint('brand_bp', __name__)
 
@@ -33,33 +33,36 @@ def add_brand():
         brand_image = request.files.get('brand_image')
 
         if not brand_name:
-            return jsonify({'error': 'Brand name is required'}), 400
+            raise ValueError("Brand name is required")
 
         if not brand_image:
-            return jsonify({'error': 'No image file provided'}), 400
+            raise ValueError("No image file provided")
 
-        res = save_file(brand_image, subfolder="images")
+        _file = SaveFile(brand_image, subfolder="images")
 
-        new_brand = Brand(name=brand_name, brand_image=res["full_url"])
+        new_brand = Brand(name=brand_name, brand_image=_file.full_url)
         db.session.add(new_brand)
         db.session.flush()
-
         db.session.commit()
 
-        return jsonify({
-            'message': 'New Brand added successfully',
-            "value": new_brand.to_dict()
-        }), 201
+        _file.save()
 
+        return ApiResponse(
+            success=True,
+            message='New Brand added successfully',
+            payload=new_brand.to_dict(),
+            status=201
+        )
     except Exception as e:
         db.session.rollback()
-        return jsonify({'error': str(e)}), 400
+        return ApiErrorResponse(e, 400)
 
 @brand_bp.delete('/delete')
 def delete_brand():
     try:
         data = request.get_json()
         brand_id = data.get('brand_id')
+        print(brand_id)
 
         if not brand_id:
             return jsonify({'error': 'Brand ID is required'}), 400
@@ -67,14 +70,15 @@ def delete_brand():
         brand = Brand.query.get_or_404(brand_id)
 
         if brand.brand_image:
-            success = delete_file(brand.brand_image, subfolder="images")
-            if not success:
+            remover = RemoveFile(brand.brand_image, subfolder="images")
+            if not remover.remove():
                 return jsonify({'error': 'Failed to delete the image file'}), 500
 
         db.session.delete(brand)
         db.session.flush()
         db.session.commit()
 
+        # return jsonify({"message":f"{brand_id} removed successfully"})
         return jsonify({'message': 'Brand deleted successfully'}), 200
 
     except Exception as e:
