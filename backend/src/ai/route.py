@@ -1,8 +1,9 @@
 import json
 import os
-from langchain_ollama.llms import OllamaLLM
+
 from langchain_core.prompts import ChatPromptTemplate
 from flask import Blueprint, request, jsonify
+from src.extensions import model
 
 ASSETS_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../assets/frontend_routes.json'))
 def load_frontend_routes():
@@ -12,7 +13,6 @@ def load_frontend_routes():
 
 ai_bp = Blueprint('ai_bp',__name__)
 
-model = OllamaLLM(model="llama3.2")
 
 @ai_bp.route('/process', methods=['POST'])
 def process_ai():
