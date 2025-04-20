@@ -1,3 +1,4 @@
+import asyncio
 import json
 import os
 
@@ -13,6 +14,8 @@ def load_frontend_routes():
 
 ai_bp = Blueprint('ai_bp',__name__)
 
+def run_chain(chain, instruction):
+    return chain.invoke({"instruction": instruction})
 
 @ai_bp.route('/process', methods=['POST'])
 def process_ai():
@@ -50,7 +53,8 @@ def process_ai():
 
         prompt = ChatPromptTemplate.from_template(template)
         chain = prompt | model
-        result = chain.invoke({"instruction": instruction})
+
+        result = asyncio.run(asyncio.to_thread(run_chain, chain, instruction))
 
         try:
             parsed = json.loads(result)
