@@ -1,14 +1,5 @@
 'use client'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import {
-    Table,
-    TableBody,
-    TableCaption,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -136,7 +127,7 @@ export default function BrandPage() {
                 </div>
             </section>
 
-            <section className="m-4 border rounded overflow-hidden">
+            {/* <section className="m-4 border rounded overflow-hidden">
                 <Table>
                     <TableCaption>Table of brands</TableCaption>
                     <TableHeader className="bg-secondary">
@@ -156,8 +147,7 @@ export default function BrandPage() {
                         </TableRow>
                     </TableBody>
                 </Table>
-
-            </section>
+            </section> */}
         </main>
     )
 }
